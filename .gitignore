@@ -1,0 +1,10 @@
+# Binaries
+main
+hello-service
+
+# IDEs
+.idea/
+.vscode/
+
+# Ansible vars (если там будут пароли)
+secret.yml
