@@ -1,5 +1,5 @@
 x-app-template: &app-template
-  image: devops-app:v1
+  image: justsaiyn/devops-app:latest
   restart: unless-stopped
   networks:
     - isolated_network
