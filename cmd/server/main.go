@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"log/slog"
 	"net/http"
@@ -161,7 +162,6 @@ func dashboardHandler(w http.ResponseWriter, r *http.Request) {
             try {
                 const response = await fetch(url);
                 const text = await response.text();
-                // Пробуем отформатировать если это JSON
                 try {
                     const json = JSON.parse(text);
                     output.textContent = JSON.stringify(json, null, 2);
@@ -206,7 +206,8 @@ func main() {
 			"hostname": hostname,
 		}
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w.Encode(response))
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(response)
 	})
 
 	mux.Handle("/metrics", promhttp.Handler())
@@ -228,7 +229,8 @@ func main() {
 	<-quit
 
 	slog.Info("Shutting down server gracefully...")
-	ctx, cancel := contextWithTimeout()
+	
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	if err := server.Shutdown(ctx); err != nil {
@@ -236,9 +238,4 @@ func main() {
 	}
 
 	slog.Info("Server stopped")
-}
-
-func contextWithTimeout() (time.Duration, func()) {
-	// Вспомогательная заглушка для таймаута контекста
-	return 5 * time.Second, func() {}
 }
