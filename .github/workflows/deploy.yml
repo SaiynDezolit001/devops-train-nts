@@ -1,0 +1,30 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main # Если твоя основная ветка называется master, замени main на master
+
+jobs:
+  build-and-deploy:
+    runs-on: self-hosted # Эта строчка отправляет задачу на твой сервер в ps.kz
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and Push Docker Image
+        run: |
+          docker build -t justsaiyn/devops-app:latest .
+          docker push justsaiyn/devops-app:latest
+
+      - name: Deploy to Server
+        run: |
+          sudo docker compose pull
+          sudo docker compose up -d
