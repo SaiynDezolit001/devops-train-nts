@@ -44,7 +44,7 @@ func main() {
 	mux.HandleFunc("GET /api/v1/hello", loggingMiddleware(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		hostname, _ := os.Hostname()
-		json.NewEncoder(w).Encode(map[string]string{"message": "Hello!", "hostname": hostname})
+		json.NewEncoder(w).Encode(map[string]string{"message": "Hello NTS team my name is Saiyn, i wish you best!", "hostname": hostname})
 	}))
 	mux.Handle("GET /metrics", promhttp.Handler())
 
