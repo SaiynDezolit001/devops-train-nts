@@ -1,14 +1,30 @@
-name: CI/CD Pipeline
+name: Production CI/CD Pipeline
 
 on:
   push:
     branches:
-      - main # Если твоя основная ветка называется master, замени main на master
+      - main
 
 jobs:
-  build-and-deploy:
-    runs-on: self-hosted # Эта строчка отправляет задачу на твой сервер в ps.kz
+  test:
+    name: Run Unit Tests
+    runs-on: self-hosted
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Run Go Tests
+        run: go test -v ./...
+
+  build-and-deploy:
+    name: Build, Push & Deploy
+    needs: test # Пайплайн пойдет дальше только после успешных тестов!
+    runs-on: self-hosted
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -24,7 +40,7 @@ jobs:
           docker build -t justsaiyn/devops-app:latest .
           docker push justsaiyn/devops-app:latest
 
-      - name: Deploy to Server
+      - name: Deploy to Production via Docker Compose
         run: |
           sudo docker compose pull
-          sudo docker compose up -d
+          sudo docker compose up -d --remove-orphans
